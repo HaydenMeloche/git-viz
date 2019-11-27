@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+	"strings"
 )
 
 func main() {
@@ -17,16 +18,24 @@ func main() {
 		return
 	}
 
-	printFolders(filePath)
+	print(strings.Join(findGitFolders(filePath), ", \n"))
 	print(email)
 
 }
 
-func printFolders(info string) () {
+func findGitFolders(info string) []string {
+	var gitLocations []string
 	items, _ := ioutil.ReadDir(info)
 	for _, item := range items {
-		print(item.Name())
+		if item.IsDir() && item.Name() == ".git" {
+			gitLocations = append(gitLocations, info + "/" + item.Name())
+			continue
+		}
+		if item.IsDir() {
+			gitLocations = append(gitLocations, findGitFolders(info + "/" + item.Name())...)
+		}
 	}
+	return gitLocations
 }
 
 func validateArguments(args []string) (string, string, error) {

@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
-	"strings"
 )
 
 func main() {
@@ -18,9 +17,8 @@ func main() {
 		return
 	}
 
-	print(strings.Join(findGitFolders(filePath), ", \n"))
-	print(email)
-
+	folders := findGitFolders(filePath)
+	stats(folders, email)
 }
 
 func findGitFolders(info string) []string {
@@ -45,10 +43,10 @@ func validateArguments(args []string) (string, string, error) {
 		return "", "", errors.New("exactly two arguments must be provided")
 	}
 
-	_, error := os.Stat(args[0])
+	_, e := os.Stat(args[0])
 
-	if error != nil {
-		return "", "", error
+	if e != nil {
+		return "", "", e
 	}
 
 	if !rxEmail.MatchString(args[1]) {
